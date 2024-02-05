@@ -58,56 +58,56 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.process_registry = REGISTRY
         self.gauges = {
             'vrm': Gauge(self.P + 'vrm_status', 'HP iLO vrm status',
-                         ["product_name", "server_name"], registry=self.registry),
+                         ["product_name", "server_name", "server_serial_num"], registry=self.registry),
             'drive': Gauge(self.P + 'drive_status', 'HP iLO drive status',
-                           ["product_name", "server_name"], registry=self.registry),
+                           ["product_name", "server_name", "server_serial_num"], registry=self.registry),
             'battery': Gauge(self.P + 'battery_status', 'HP iLO battery status',
-                             ["product_name", "server_name"], registry=self.registry),
+                             ["product_name", "server_name", "server_serial_num"], registry=self.registry),
             'storage': Gauge(self.P + 'storage_status', 'HP iLO storage status',
-                             ["product_name", "server_name"], registry=self.registry),
+                             ["product_name", "server_name", "server_serial_num"], registry=self.registry),
             'fans': Gauge(self.P + 'fans_status', 'HP iLO all fans status',
-                          ["product_name", "server_name"], registry=self.registry),
+                          ["product_name", "server_name", "server_serial_num"], registry=self.registry),
             'bios_hardware': Gauge(self.P + 'bios_hardware_status', 'HP iLO bios_hardware status',
-                                   ["product_name", "server_name"], registry=self.registry),
+                                   ["product_name", "server_name", "server_serial_num"], registry=self.registry),
             'memory': Gauge(self.P + 'memory_status', 'HP iLO memory status',
-                            ["product_name", "server_name"], registry=self.registry),
+                            ["product_name", "server_name", "server_serial_num"], registry=self.registry),
             'power_supplies': Gauge(self.P + 'power_supplies_status', 'HP iLO power_supplies status',
-                                    ["product_name", "server_name"], registry=self.registry),
+                                    ["product_name", "server_name", "server_serial_num"], registry=self.registry),
             'processor': Gauge(self.P + 'processor_status', 'HP iLO processor status',
-                               ["product_name", "server_name"], registry=self.registry),
+                               ["product_name", "server_name", "server_serial_num"], registry=self.registry),
             'network': Gauge(self.P + 'network_status', 'HP iLO network status',
-                             ["product_name", "server_name"], registry=self.registry),
+                             ["product_name", "server_name", "server_serial_num"], registry=self.registry),
             'temperature': Gauge(self.P + 'temperature_status', 'HP iLO temperature status',
-                                 ["product_name", "server_name"], registry=self.registry),
+                                 ["product_name", "server_name", "server_serial_num"], registry=self.registry),
             'firmware_version': Gauge(self.P + 'firmware_version', 'HP iLO firmware version',
-                                      ["product_name", "server_name"], registry=self.registry),
+                                      ["product_name", "server_name", "server_serial_num"], registry=self.registry),
             'nic_status': Gauge(self.P + 'nic_status', 'HP iLO NIC status',
-                                ["product_name", "server_name", "nic_name", "ip_address"], registry=self.registry),
+                                ["product_name", "server_name", "nic_name", "ip_address", "server_serial_num"], registry=self.registry),
             'storage_cache_health': Gauge(self.P + 'storage_cache_health_status', 'Cache Module status',
-                                          ["product_name", "server_name", "controller"], registry=self.registry),
+                                          ["product_name", "server_name", "controller", "server_serial_num"], registry=self.registry),
             'storage_controller_health': Gauge(self.P + 'storage_controller_health_status', 'Controller status',
-                                               ["product_name", "server_name", "controller"], registry=self.registry),
+                                               ["product_name", "server_name", "controller", "server_serial_num"], registry=self.registry),
             'storage_enclosure_health': Gauge(self.P + 'storage_enclosure_health_status', 'Enclosure status',
-                                              ["product_name", "server_name", "controller", "enc"],
+                                              ["product_name", "server_name", "controller", "enc", "server_serial_num"],
                                               registry=self.registry),
             'storage_ld_health': Gauge(self.P + 'storage_ld_health_status', 'LD status',
-                                       ["product_name", "server_name", "controller", "logical_drive"],
+                                       ["product_name", "server_name", "controller", "logical_drive", "server_serial_num"],
                                        registry=self.registry),
             'storage_pd_health': Gauge(self.P + 'storage_pd_health_status', 'PD status',
-                                       ["product_name", "server_name", "controller", "logical_drive", "physical_drive"],
+                                       ["product_name", "server_name", "controller", "logical_drive", "physical_drive", "server_serial_num"],
                                        registry=self.registry),
             'temperature_value': Gauge(self.P + 'temperature_value', 'Temperature value',
-                                       ["product_name", "server_name", "sensor"], registry=self.registry),
+                                       ["product_name", "server_name", "sensor", "server_serial_num"], registry=self.registry),
             'fan': Gauge(self.P + 'fan_status', 'HP iLO one fan status',
-                         ["product_name", "server_name", "fan"], registry=self.registry),
+                         ["product_name", "server_name", "fan", "server_serial_num"], registry=self.registry),
             'fan_speed': Gauge(self.P + 'fan_speed', 'HP iLO one fan value',
-                               ["product_name", "server_name", "fan"], registry=self.registry),
+                               ["product_name", "server_name", "fan", "server_serial_num"], registry=self.registry),
             'power_supply': Gauge(self.P + 'power_supply_status', 'HP iLO one power supply power',
-                                  ["product_name", "server_name", "ps"], registry=self.registry),
+                                  ["product_name", "server_name", "ps", "server_serial_num"], registry=self.registry),
             'running': Gauge(self.P + 'running_status', 'HP iLO running status',
-                             ["product_name", "server_name"], registry=self.registry),
+                             ["product_name", "server_name", "server_serial_num"], registry=self.registry),
             'oa_info': Gauge(self.P + 'onboard_administrator_info', 'HP iLO OnBoard Administrator Info',
-                             ["product_name", "server_name", "oa_ip", "encl", "location_bay"], registry=self.registry),
+                             ["product_name", "server_name", "oa_ip", "encl", "location_bay", "server_serial_num"], registry=self.registry),
         }
         BaseHTTPRequestHandler.__init__(self, request, client_address, server)
 
@@ -119,7 +119,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                     if status[0] == 'status':
                         health = status[1].upper()
                         self.gauges[key].labels(product_name=self.product_name,
-                                                server_name=self.server_name).set(translate(health))
+                                                server_name=self.server_name, server_serial_num=self.server_serial_num).set(translate(health))
 
     def watch_temperature(self):
         temperature_values = self.embedded_health.get('temperature', {})
@@ -130,6 +130,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 if type(s_value[0]) is int:
                     self.gauges['temperature_value'].labels(product_name=self.product_name,
                                                             server_name=self.server_name,
+                                                            server_serial_num=self.server_serial_num,
                                                             sensor=s_name).set(int(s_value[0]))
 
     def watch_fan(self):
@@ -142,9 +143,11 @@ class RequestHandler(BaseHTTPRequestHandler):
                 if type(s_speed[0]) is int:
                     self.gauges['fan_speed'].labels(product_name=self.product_name,
                                                     server_name=self.server_name,
+                                                    server_serial_num=self.server_serial_num,
                                                     fan=s_name).set(int(s_speed[0]))
                 self.gauges['fan'].labels(product_name=self.product_name,
                                           server_name=self.server_name,
+                                          server_serial_num=self.server_serial_num,
                                           fan=s_name).set(translate(s_status))
 
     def watch_ps(self):
@@ -155,6 +158,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 s_value = p_value.get('status', 'ABSENT')
                 self.gauges['power_supply'].labels(product_name=self.product_name,
                                                    server_name=self.server_name,
+                                                   server_serial_num=self.server_serial_num,
                                                    ps=s_name).set(translate(s_value))
 
     def watch_disks(self):
@@ -165,12 +169,11 @@ class RequestHandler(BaseHTTPRequestHandler):
                 cache_health = c_value.get('cache_module_status', 'absent')
                 self.gauges['storage_cache_health'].labels(product_name=self.product_name,
                                                            server_name=self.server_name,
+                                                           server_serial_num=self.server_serial_num,
                                                            controller=c_model).set(
                     translate(cache_health))
                 controller_health = c_value.get('controller_status', 'unknown')
-                self.gauges['storage_controller_health'].labels(product_name=self.product_name,
-                                                                server_name=self.server_name, controller=c_model).set(
-                    translate(controller_health))
+                self.gauges['storage_controller_health'].labels(product_name=self.product_name, server_name=self.server_name, server_serial_num=self.server_serial_num, controller=c_model).set(translate(controller_health))
                 e_key = 0
                 enlist = c_value.get('drive_enclosures', [])
                 if enlist is not None:
@@ -178,8 +181,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                         enclosure_health = e_value.get('status', 'unknown')
                         self.gauges['storage_enclosure_health'].labels(product_name=self.product_name,
                                                                        server_name=self.server_name,
-                                                                       controller=c_model, enc=e_key).set(
-                            translate(enclosure_health))
+                                                                       server_serial_num=self.server_serial_num, controller=c_model, enc=e_key).set(translate(enclosure_health))
                         e_key = e_key + 1
                 ld_list = c_value.get('logical_drives', [])
                 if ld_list is not None:
@@ -190,6 +192,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                             'fault_tolerance', '')
                         self.gauges['storage_ld_health'].labels(product_name=self.product_name,
                                                                 server_name=self.server_name,
+                                                                server_serial_num=self.server_serial_num,
                                                                 controller=c_model,
                                                                 logical_drive=ld_name).set(
                             translate(ld_status))
@@ -203,6 +206,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                                           pd_value.get('location', 'N' + str(pd_key))
                                 self.gauges['storage_pd_health'].labels(product_name=self.product_name,
                                                                         server_name=self.server_name,
+                                                                        server_serial_num=self.server_serial_num,
                                                                         controller=c_model,
                                                                         logical_drive=ld_name,
                                                                         physical_drive=pd_name).set(
@@ -290,6 +294,13 @@ class RequestHandler(BaseHTTPRequestHandler):
             except:
                 self.server_name = ilo_host
 
+            # get server serial number
+            try:
+                host_info = ilo.get_host_data()
+                self.server_serial_num = [d["Serial Number"] for d in host_info if "Serial Number" in d][1]
+            except:
+                self.server_serial_num = "Unknown Serial Number"
+
             # get health, mod by n27051538
             self.embedded_health = ilo.get_embedded_health()
             self.watch_health_at_glance()
@@ -300,7 +311,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             try:
                 running = ilo.get_host_power_status()
-                self.gauges['running'].labels(product_name=self.product_name, server_name=self.server_name).set(
+                self.gauges['running'].labels(product_name=self.product_name, server_name=self.server_name, server_serial_num=self.server_serial_num).set(
                     translate(running))
             except:
                 pass
@@ -317,14 +328,14 @@ class RequestHandler(BaseHTTPRequestHandler):
                         value = 4
                         print_err('unrecognised nic status: {}'.format(nic['status']))
 
-                    self.gauges['nic_status'].labels(product_name=self.product_name, server_name=self.server_name,
-                                                     nic_name=nic_name, ip_address=nic['ip_address']).set(value)
+#                    self.gauges['nic_status'].labels(product_name=self.product_name, server_name=self.server_name, server_serial_num=self.server_serial_num, nic_name=nic_name, ip_address=nic['ip_address']).set(value)
+                    self.gauges['nic_status'].labels(product_name=self.product_name, server_name=self.server_name, server_serial_num=self.server_serial_num, nic_name=nic_name, ip_address=nic['ip_address']).set(value)
 
             # get firmware version
             try:
                 fw_version = ilo.get_fw_version()["firmware_version"]
                 self.gauges['firmware_version'].labels(product_name=self.product_name,
-                                                       server_name=self.server_name).set(fw_version)
+                                                       server_name=self.server_name, server_serial_num=self.server_serial_num).set(fw_version)
             except:
                 pass
 
@@ -332,6 +343,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 oa_info = ilo.get_oa_info()
                 self.gauges['oa_info'].labels(product_name=self.product_name,
                                               server_name=self.server_name,
+                                              server_serial_num=self.server_serial_num,
                                               oa_ip=oa_info.get('ipaddress',''),
                                               encl=oa_info.get('encl',''),
                                               location_bay=oa_info.get('location',''),
