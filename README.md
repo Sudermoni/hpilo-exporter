@@ -18,6 +18,7 @@ Here are the status code of gauge
  0 - OK
  1 - Degraded
  2 - Dead (Other)
+ 3 - Unknown
 ```
 
 
