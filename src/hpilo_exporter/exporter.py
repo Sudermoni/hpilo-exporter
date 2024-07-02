@@ -38,10 +38,12 @@ def translate(st):
         return 0
     elif st.upper() == 'DEGRADED':
         return 1
+    elif st.upper() in ['OFF'] or st in ['Permanent Failure']:
+        return 2
     elif st.upper() == 'ABSENT':
         return -1
     else:
-        return 2
+        return 3
 
 
 class RequestHandler(BaseHTTPRequestHandler):
@@ -63,6 +65,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                            ["product_name", "server_name", "server_serial_num"], registry=self.registry),
             'battery': Gauge(self.P + 'battery_status', 'HP iLO battery status',
                              ["product_name", "server_name", "server_serial_num"], registry=self.registry),
+            'battery_detail': Gauge(self.P + 'battery_detail', 'HP iLO battery detailed status', ["label", "present", "model", "spare", "serial_number", "capacity", "firmware_version", "product_name", "server_name", "server_serial_num"], registry=self.registry),
             'storage': Gauge(self.P + 'storage_status', 'HP iLO storage status',
                              ["product_name", "server_name", "server_serial_num"], registry=self.registry),
             'fans': Gauge(self.P + 'fans_status', 'HP iLO all fans status',
@@ -71,10 +74,18 @@ class RequestHandler(BaseHTTPRequestHandler):
                                    ["product_name", "server_name", "server_serial_num"], registry=self.registry),
             'memory': Gauge(self.P + 'memory_status', 'HP iLO memory status',
                             ["product_name", "server_name", "server_serial_num"], registry=self.registry),
+            'memory_detail': Gauge(self.P + 'memory_detail_status', 'HP iLO memory detailed status',
+                                   ["product_name", "server_name", "server_serial_num", "cpu_id", "socket_id", "frequency", "hp_smart_memory", "minimum_voltage", "part_number", "ranks", "size", "technology", "mem_type"], registry=self.registry),
+            'memory_detail_summary': Gauge(self.P + 'memory_detail_summary', 'HP iLO memory Summary',
+                                           ["product_name", "server_name", "server_serial_num", "cpu_id", "operating_frequency", "operating_voltage"], registry=self.registry),
             'power_supplies': Gauge(self.P + 'power_supplies_status', 'HP iLO power_supplies status',
                                     ["product_name", "server_name", "server_serial_num"], registry=self.registry),
+            'power_supplies_readings': Gauge(self.P + 'power_supplies_readings', 'HP iLO power_supplies readings',
+                                             ["product_name", "server_name", "server_serial_num"], registry=self.registry),
             'processor': Gauge(self.P + 'processor_status', 'HP iLO processor status',
                                ["product_name", "server_name", "server_serial_num"], registry=self.registry),
+            'processor_detail': Gauge(self.P + 'processor_detail_status', 'HP iLO processor detailed status',
+                               ["product_name", "server_name", "server_serial_num", "cpu_id", "name", "speed"], registry=self.registry),
             'network': Gauge(self.P + 'network_status', 'HP iLO network status',
                              ["product_name", "server_name", "server_serial_num"], registry=self.registry),
             'temperature': Gauge(self.P + 'temperature_status', 'HP iLO temperature status',
@@ -133,6 +144,43 @@ class RequestHandler(BaseHTTPRequestHandler):
                                                             server_serial_num=self.server_serial_num,
                                                             sensor=s_name).set(int(s_value[0]))
 
+    def watch_processor(self):
+        processors_values = self.embedded_health.get('processors', {})
+        if processors_values is not None:
+            for p_key, p_value in processors_values.items():
+                s_cpuid = p_key
+                s_name = p_value.get('name', 'N/A') 
+                s_speed = p_value.get('speed', 'N/A')
+                s_status = p_value.get('status', 'N/A')
+                self.gauges["processor_detail"].labels(product_name=self.product_name, server_name=self.server_name, server_serial_num=self.server_serial_num, cpu_id=s_cpuid.split()[1], name=s_name.strip(), speed=s_speed).set(translate(s_status))
+
+    def watch_memory(self):
+        memory_values = self.embedded_health.get('memory', {}).get('memory_details', {})
+        if memory_values is not None:
+            for cpu_key, cpu_value in memory_values.items():
+                for socket_key, socket_value in cpu_value.items():
+                    s_status = socket_value.get('status', 'N/A')
+                    if s_status != "Not Present":
+                        socket_id = socket_value.get('socket', 'N/A')
+                        frequency = socket_value.get('frequency', 'N/A')
+                        hp_smart_memory = socket_value.get('hp_smart_memory', 'N/A')
+                        minimum_voltage = socket_value.get('minimum_voltage', 'N/A')
+                        part_number = socket_value.get('part', {}).get('number', 'N/A')
+                        ranks = socket_value.get('ranks', 'N/A')
+                        size = socket_value.get('size', 'N/A')
+                        technology = socket_value.get('technology', 'N/A')
+                        memory_type = socket_value.get('type', 'N/A')
+                        self.gauges["memory_detail"].labels(product_name=self.product_name, server_name=self.server_name, server_serial_num=self.server_serial_num, cpu_id=cpu_key, socket_id=socket_id, frequency=frequency, hp_smart_memory=hp_smart_memory, minimum_voltage=minimum_voltage, part_number=part_number, ranks=ranks, size=size, technology=technology, mem_type=memory_type).set(translate(s_status))
+
+    def watch_memory_summary(self):
+        memory_values = self.embedded_health.get('memory', {})
+        if memory_values is not None:
+            memory_details_summary = self.embedded_health.get('memory', {}).get('memory_details_summary', {})
+            if memory_details_summary is not None:
+               for cpu_idx, cpu in memory_details_summary.items():
+                   total_memory_size = 0 if (cpu['total_memory_size'] == 'N/A') else int(cpu['total_memory_size'].split()[0])
+                   self.gauges["memory_detail_summary"].labels(product_name=self.product_name, server_name=self.server_name, server_serial_num=self.server_serial_num, cpu_id=cpu_idx.split("_")[1], operating_frequency=cpu['operating_frequency'], operating_voltage=cpu['operating_voltage']).set(total_memory_size)
+
     def watch_fan(self):
         fan_values = self.embedded_health.get('fans', {})
         if fan_values is not None:
@@ -160,6 +208,28 @@ class RequestHandler(BaseHTTPRequestHandler):
                                                    server_name=self.server_name,
                                                    server_serial_num=self.server_serial_num,
                                                    ps=s_name).set(translate(s_value))
+
+        ps_readings_values = self.embedded_health.get('power_supply_summary', {})
+        if ps_readings_values is not None:
+            if 'present_power_reading' in ps_readings_values:
+                # TODO: implement error handling
+                readings = ps_readings_values['present_power_reading']
+                self.gauges["power_supplies_readings"].labels(product_name=self.product_name, server_name=self.server_name, server_serial_num=self.server_serial_num).set(int(readings.split()[0]))
+
+    def watch_battery(self):
+        power_supplies = self.embedded_health.get('power_supplies', {})
+        if power_supplies is not None:
+            if 'Battery 1' in power_supplies:
+                batt = power_supplies['Battery 1']
+                label_b = batt['label']
+                present_b = batt['present']
+                status_b = batt['status']
+                model_b = batt['model']
+                spare_b = batt['spare']
+                serial_number_b = batt['serial_number']
+                capacity_b = batt['capacity']
+                firmware_version_b = batt['firmware_version']
+                self.gauges["battery_detail"].labels(label=label_b, present=present_b, model=model_b, spare=spare_b, serial_number=serial_number_b, capacity=capacity_b, firmware_version=firmware_version_b, product_name=self.product_name, server_name=self.server_name, server_serial_num=self.server_serial_num).set(translate(status_b))
 
     def watch_disks(self):
         storage_health = self.embedded_health.get('storage', {})
@@ -304,8 +374,12 @@ class RequestHandler(BaseHTTPRequestHandler):
             # get health, mod by n27051538
             self.embedded_health = ilo.get_embedded_health()
             self.watch_health_at_glance()
+            self.watch_battery()
             self.watch_disks()
             self.watch_temperature()
+            self.watch_processor()
+            self.watch_memory()
+            self.watch_memory_summary()
             self.watch_fan()
             self.watch_ps()
 
